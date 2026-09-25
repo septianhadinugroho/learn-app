@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💻 Next.js Auth & Dashboard Client
 
-## Getting Started
+A modern, responsive, and secure frontend client built with **Next.js 15 (App Router)**, **TypeScript**, and **Tailwind CSS**. Designed as the user interface for the Authentication Starter Kit, featuring dynamic UI components, multi-step auth flows, and Google OAuth integration.
 
-First, run the development server:
+---
+
+## ✨ Key Features
+
+- **Authentication & Onboarding**
+  - Single-page Auth interface supporting **Login**, **Register**, **Email OTP Verification**, and **Multi-step Password Recovery**.
+  - Integrated **Google Sign-In** with `@react-oauth/google`.
+  - Custom password visibility toggle (Eye Show/Hide) with cross-browser CSS normalization.
+
+- **Smart User Dashboard**
+  - Dynamic user profile management with conditional rendering.
+  - **OAuth Protection**: Automatically locks email fields and hides password change settings for Google Sign-In users.
+  - **Secure Email Update**: Modal prompt for OTP verification when changing profile email address.
+  - **Custom Tailwind Confirmation Modal**: Interactive modal for account deletion without browser native `confirm()` popups.
+
+- **UX & Feedback**
+  - Inline loading indicators and button spinners during API requests.
+  - Clean error and success alert callouts.
+
+---
+
+## 🛠️ Tech Stack
+
+| Category       | Technology                     |
+|-----------------|----------------------------------|
+| Framework       | Next.js 15 (App Router)         |
+| Language        | TypeScript                       |
+| Styling         | Tailwind CSS                     |
+| HTTP Client     | Axios                             |
+| OAuth Library   | `@react-oauth/google`            |
+| Deployment      | Vercel                            |
+
+---
+
+## 📁 Folder Structure
+
+```
+learn-ex-frontend/
+├── src/
+│   ├── app/
+│   │   ├── dashboard/
+│   │   │   └── page.tsx        # Protected Dashboard page & Profile settings
+│   │   ├── globals.css         # Global styles & password reveal CSS reset
+│   │   ├── layout.tsx          # Root layout with Google OAuth Provider
+│   │   └── page.tsx            # Multi-view Auth Page (Login, Register, Reset, OTP)
+│   └── lib/
+│       └── api.ts              # Axios configuration with JWT interceptor
+├── .env.local                  # Local environment variables
+├── next.config.ts              # Next.js configuration
+├── package.json                # Client dependencies & scripts
+└── tailwind.config.ts          # Tailwind CSS configuration
+```
+
+---
+
+## 🔑 Environment Variables (`.env.local`)
+
+Create a `.env.local` file in the root directory of the frontend project:
+
+```env
+NEXT_PUBLIC_API_URL="http://localhost:5000/api"
+NEXT_PUBLIC_GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
+```
+
+For production deployment on Vercel: ensure `NEXT_PUBLIC_API_URL` points to your deployed Express backend URL (e.g. `https://your-backend.vercel.app/api`).
+
+---
+
+## 🚦 Local Getting Started
+
+**1. Clone Repository & Install Dependencies**
+
+```bash
+git clone <repository-frontend-url>
+cd learn-ex-frontend
+npm install
+```
+
+**2. Run Development Server**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**3. Build for Production**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+npm start
+```
