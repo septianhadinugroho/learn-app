@@ -64,21 +64,21 @@ export default function DashboardPage() {
     <button
       type="button"
       onClick={toggle}
-      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 rounded-md"
+      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 rounded-md z-10"
     >
       {show ? (
-        // Eye Off Icon
+        // Tampilkan Mata Terbuka saat show = true
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      ) : (
+        // Tampilkan Mata Coret saat show = false (password ••••)
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
           <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
           <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
           <line x1="2" x2="22" y1="2" y2="22" />
-        </svg>
-      ) : (
-        // Eye Icon
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-          <circle cx="12" cy="12" r="3" />
         </svg>
       )}
     </button>
@@ -228,12 +228,15 @@ export default function DashboardPage() {
         {/* Update Profile */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
           <h2 className="text-sm font-bold text-slate-900">Profile Settings</h2>
+          
           {profileMsg && (
             <div className="p-3 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl font-medium">
               {profileMsg}
             </div>
           )}
+
           <form onSubmit={handleUpdateProfile} className="space-y-3.5">
+            {/* Full Name Field */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
               <input
@@ -244,16 +247,29 @@ export default function DashboardPage() {
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition"
               />
             </div>
+
+            {/* Email Field (Disabled jika Google User) */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
               <input
                 type="email"
                 required
+                disabled={isGoogleUser}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition"
+                className={`w-full px-3.5 py-2.5 border rounded-xl text-sm transition ${
+                  isGoogleUser
+                    ? 'bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed'
+                    : 'bg-slate-50 text-slate-900 border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white'
+                }`}
               />
+              {isGoogleUser && (
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Email is managed by Google Sign-In and cannot be modified.
+                </p>
+              )}
             </div>
+
             <button
               type="submit"
               disabled={actionLoading}
