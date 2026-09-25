@@ -29,6 +29,11 @@ export default function DashboardPage() {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [passwordMsg, setPasswordMsg] = useState('');
 
+  // State Tambahan di Dashboard
+  const [showEmailOtpModal, setShowEmailOtpModal] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [emailOtpCode, setEmailOtpCode] = useState('');
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const localUser = localStorage.getItem('user');
@@ -79,6 +84,7 @@ export default function DashboardPage() {
     </button>
   );
 
+  // Update Profile Submit Handler
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setActionLoading(true);
@@ -86,12 +92,43 @@ export default function DashboardPage() {
 
     try {
       const res = await api.put('/auth/profile', { name, email });
-      setProfileMsg(res.data.message);
-      const updatedUser = { ...user, name, email };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      if (res.data.requiresEmailVerification) {
+        // Buka modal OTP jika email berubah
+        setPendingEmail(res.data.pendingEmail);
+        setShowEmailOtpModal(true);
+        setProfileMsg('Please enter the OTP sent to your new email.');
+      } else {
+        setProfileMsg(res.data.message);
+        const updatedUser = { ...user, name };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
     } catch (err: any) {
       setProfileMsg(err.response?.data?.message || 'Update failed');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Confirm New Email OTP Handler
+  const handleVerifyNewEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActionLoading(true);
+
+    try {
+      const res = await api.put('/auth/verify-new-email', {
+        newEmail: pendingEmail,
+        otpCode: emailOtpCode,
+      });
+
+      setShowEmailOtpModal(false);
+      setProfileMsg(res.data.message);
+      setUser(res.data.data);
+      localStorage.setItem('user', JSON.stringify(res.data.data));
+      setEmailOtpCode('');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Email verification failed');
     } finally {
       setActionLoading(false);
     }
@@ -349,6 +386,47 @@ export default function DashboardPage() {
                 Yes, Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL VERIFIKASI EMAIL BARU */}
+      {showEmailOtpModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 border border-slate-100 shadow-xl">
+            <div className="text-center">
+              <h3 className="text-base font-bold text-slate-900">Verify New Email</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Enter 6-digit OTP code sent to <span className="font-semibold text-slate-800">{pendingEmail}</span>
+              </p>
+            </div>
+
+            <form onSubmit={handleVerifyNewEmail} className="space-y-4">
+              <input
+                type="text"
+                required
+                maxLength={6}
+                value={emailOtpCode}
+                onChange={(e) => setEmailOtpCode(e.target.value)}
+                className="w-full px-3 py-3 bg-slate-50 border border-slate-300 rounded-xl text-center text-xl tracking-[0.4em] font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                placeholder="000000"
+              />
+              <div className="flex space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEmailOtpModal(false)}
+                  className="flex-1 py-2.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading}
+                  className="flex-1 py-2.5 bg-slate-900 text-white text-xs font-semibold rounded-xl disabled:opacity-50"
+                >
+                  {actionLoading ? 'Verifying...' : 'Confirm Email'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
